@@ -110,7 +110,7 @@ public class PersonalFragment extends Fragment {
                 if((gpsInfo != null) && (wearableDeviceInfo!=null)) {
                     movingStatusAdapter.setValueStrLIst(new String[]{
                             wearableDeviceInfo.getHeartRate().toString(), wearableDeviceInfo.getSpeed().toString() + "m/s",
-                            wearableDeviceInfo.getBodyTemperature().toString() + getString(R.string.temp_symbol), "学校"/*gpsInfo.getLocationType().getLocType()*/});
+                            wearableDeviceInfo.getBodyTemperature().toString() + getString(R.string.temp_symbol), gpsInfo.getLocationType().getLocType()});
                     movingStatusAdapter.notifyDataSetChanged();
                 }
                 else {
@@ -334,31 +334,6 @@ public class PersonalFragment extends Fragment {
         super.onResume();
         flag = true;
         handler.postDelayed(runnable, 0);
-        /*if((gpsInfo != null) && (wearableDeviceInfo!=null))
-            movingStatusAdapter.setValueStrLIst(new String[]{
-                    wearableDeviceInfo.getHeartRate().toString(), wearableDeviceInfo.getSpeed().toString()+"m/s",
-                    wearableDeviceInfo.getBodyTemperature().toString()+getString(R.string.temp_symbol), gpsInfo.getLocationType().getLocType()});
-        else
-            movingStatusAdapter.setValueStrLIst(new String[]{"72", "20 m/s", "37"+getString(R.string.temp_symbol), "学校"});*/
-
-        /*if(socialInfo != null){
-            String activityType = socialInfo.getActivityType().getActivityType();
-            int sourceTypeId =socialInfo.getSocialSource().getSourceTypeId();
-            switch (sourceTypeId){
-                case 3:
-                    socialAdapter.setValueStrLIst(new String[]{activityType,"暂无","暂无"});
-                    break;
-                case 2:
-                    socialAdapter.setValueStrLIst(new String[]{"暂无",activityType,"暂无"});
-                    break;
-                case 1:
-                    socialAdapter.setValueStrLIst(new String[]{"暂无","暂无",activityType});
-                    break;
-
-            }
-        }
-        else
-            socialAdapter.setValueStrLIst(new String[]{"暂无","暂无","暂无"});*/
     }
 
     @Override

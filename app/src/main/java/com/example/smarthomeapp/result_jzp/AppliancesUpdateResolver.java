@@ -7,13 +7,16 @@ import com.example.smarthomeapp.listener.HttpResultProcessListener;
 import com.example.smarthomeapp.model.AirConditionStatus;
 import com.example.smarthomeapp.model.CurtainStatus;
 import com.example.smarthomeapp.model.LampStatus;
+import com.example.smarthomeapp.model.Room;
 import com.example.smarthomeapp.model.SheSwitchStatus;
+import com.example.smarthomeapp.model.UserInfo;
 import com.example.smarthomeapp.model.WaterHeaterStatus;
 import com.example.smarthomeapp.util.AsyncHttpUtil;
 import com.example.smarthomeapp.util.GsonUtil;
 import com.google.gson.Gson;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /**
  * Created by ������ on 2015/7/22.
@@ -28,6 +31,7 @@ public class AppliancesUpdateResolver implements
         lampStatus.setIsControlledByUser(false);
         lampStatus.setIsAlreadyControlled(false);
         String tmpstr = gson.toJson(lampStatus, LampStatus.class);
+        Log.d("appliance_control", tmpstr);
         AsyncHttpUtil.requestJson(context, url, tmpstr, listener);
     }
 
@@ -67,12 +71,43 @@ public class AppliancesUpdateResolver implements
 
     public static void updateWaterHeaterStatus(Context context,WaterHeaterStatus waterHeaterStatus  ,
                                                HttpResultProcessListener listener){
-
         String url = "http://202.117.14.247:8080/smarthome/appliance/waterHeater";
         Gson gson = GsonUtil.create();
         waterHeaterStatus.setIsAlreadyControlled(false);
         String tmpstr = gson.toJson(waterHeaterStatus, WaterHeaterStatus.class);
         AsyncHttpUtil.requestJson(context,url,tmpstr,listener);
+    }
+
+    /*创建房间*/
+    public static void create_room(Context context, Room room, HttpResultProcessListener listener){
+        String url = "http://192.168.1.39:8080/smarthome/room/saveRoom";
+        Gson gson = GsonUtil.create();
+        String tmpstr = gson.toJson(room, Room.class);
+        Log.d("add_room", tmpstr);
+        AsyncHttpUtil.requestJson(context, url, tmpstr, listener);
+    }
+    /*创建用户*/
+    public static void create_user(Context context, UserInfo userInfo, HttpResultProcessListener listener){
+        String url = "http://192.168.1.39:8080/smarthome/userInfo/saveUserInfo";
+        Gson gson = GsonUtil.create();
+        String tmpstr = gson.toJson(userInfo, UserInfo.class);
+        AsyncHttpUtil.requestJson(context, url, tmpstr, listener);
+    }
+    /*登陆*/
+    public static void app_login(Context context, ArrayList<String> name_pwd, HttpResultProcessListener listener){
+        String url = "http://192.168.1.39:8080/smarthome/userInfo/UserLogin";
+        Gson gson = GsonUtil.create();
+        String tmpstr = gson.toJson(name_pwd, ArrayList.class);
+        AsyncHttpUtil.requestJson(context, url, tmpstr, listener);
+    }
+    /*查询房间*/
+    public static void query_room(Context context, Integer user_id, HttpResultProcessListener listener){
+        String url = "http://192.168.1.39:8080/smarthome/room/searchroom/" + user_id.toString();
+        Log.d("login", url);
+        Gson gson = GsonUtil.create();
+        String tmpstr = gson.toJson(user_id, Integer.class);
+        //AsyncHttpUtil.requestJson(context, url, tmpstr, listener);
+        AsyncHttpUtil.requestJsonViaGet(context, url, listener);
     }
 
     public void processing(int status, String responsString){

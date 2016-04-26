@@ -103,7 +103,6 @@ public class ServiceTestActivity extends Activity {
                     startService(intent);
                     Log.d(TAG1, "start service");
                 }
-
             }
         });
 

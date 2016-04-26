@@ -114,7 +114,6 @@ public class CollectDataService extends Service {
     };
     private int gpsInterval = 0;
 
-
     private Handler mHandler;
 
     private Timer mTimer;

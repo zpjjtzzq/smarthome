@@ -3,6 +3,7 @@ package com.example.smarthomeapp.activities.xuhong;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -14,12 +15,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.smarthomeapp.R;
+import com.example.smarthomeapp.activities.ServiceTestActivity;
 import com.example.smarthomeapp.adapter.V13ShemsFragmentPagerAdapter;
 import com.example.smarthomeapp.adapter.ShemsGridViewAdapter;
 import com.example.smarthomeapp.fragment.FamilyFragment;
 import com.example.smarthomeapp.fragment.PersonalFragment;
 import com.example.smarthomeapp.fragment.StatisticFragment;
 import com.example.smarthomeapp.fragment.ToolsFragment;
+import com.example.smarthomeapp.services.CollectDataService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,7 @@ public class UIMainActivity extends Activity {
     private ViewPager viewPager;
     private GridView gridView;
     private ShemsGridViewAdapter gridViewAdapter;
+    public static Integer user_id;
 
     public void setActionBarText(String string){
         actionBarTextView.setText(string);
@@ -45,17 +49,13 @@ public class UIMainActivity extends Activity {
         actionBarTextView = (TextView) findViewById(R.id.txt_hint_title);
         actionBarTextView.setText(R.string.title_activity_ui__main);
         ImageButton button = (ImageButton) findViewById(R.id.btn_back);
-
         button.setImageDrawable(getResources().getDrawable(R.drawable.icon_smarthome));
-
     }
     private void findViews() {
         actionBar = getActionBar();
         gridView=(GridView)findViewById(R.id.grid_view_main_ui);
         viewPager= (ViewPager) findViewById(R.id.view_pager_mainui);
     }
-
-
     private void initViewPager(){
         fragmentsList = new ArrayList<>();
         fragmentsList.add(new FamilyFragment());
@@ -106,9 +106,16 @@ public class UIMainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d("CreateOrder", "ui_main_create");
+        Log.d("life_cycle", "ui_main_create");
         setContentView(R.layout.activity_ui_main);
+        ////////////////////////启动服务
+        Intent intent = new Intent(this, CollectDataService.class);
+        startService(intent);
+        //////////////////////////////////////////
+        //获取user_id
+        Intent intent_user = getIntent();
+        user_id = intent_user.getIntExtra("user_id", 2);
+        ////////////////////////
         findViews();
         initActionBar();
         initViewPager();
@@ -129,7 +136,4 @@ public class UIMainActivity extends Activity {
             }
         });
     }
-
-
-
 }

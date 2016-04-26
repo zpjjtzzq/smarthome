@@ -1,6 +1,7 @@
 package com.example.smarthomeapp.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.example.smarthomeapp.R;
 import com.example.smarthomeapp.listener.HttpResultProcessListener;
+import com.example.smarthomeapp.model.Lamp;
 import com.example.smarthomeapp.model.LampStatus;
 import com.example.smarthomeapp.result_jzp.AppliancesUpdateResolver;
 
@@ -86,9 +88,13 @@ public class LightFragmentAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                     lightStatusesArray[position].setLampStatusId(position);
+                    Lamp lamp = new Lamp();
+                    lamp.setLampId(position+1);
+                    lightStatusesArray[position].setLamp(lamp);
                     if (lightStatusesArray[position].getLampStatus() == 1) {
                         lightStatusesArray[position].setLampStatus(0);
                     } else lightStatusesArray[position].setLampStatus(1);
+                    Log.i("lamp_status",""+ position);
                     AppliancesUpdateResolver.updateLampStatus(context, lightStatusesArray[position], httpResultProcessListener);
                     lightFragmentAdapter.notifyDataSetChanged();
                 }

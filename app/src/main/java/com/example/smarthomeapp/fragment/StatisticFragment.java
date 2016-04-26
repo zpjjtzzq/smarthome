@@ -50,9 +50,15 @@ public class StatisticFragment extends Fragment {
     private DailyElectricityPrice dailyElectricityPrice;
     private ElectricityInfo[] electricityInfos;
     private DailyElectricityPriceHelper dailyElectricityPriceHelper = new DailyElectricityPriceHelper();
+    private String[] timeVals2;
+    private float[] totalEnergy;
+    private float[] plrDatas;
+    private float[] temperatureDatas;
+    private String[] timeVals1;
 
     private Boolean flag;
-    private final static int TIME = 5000;
+    private Boolean tFlag = false, dFlag = false, pFlag = false, eFlag = false;
+    private final static int TIME = 1800000;
     SimpleDateFormat format = new SimpleDateFormat("HH:mm");
 
 
@@ -67,19 +73,76 @@ public class StatisticFragment extends Fragment {
         public void processing(int status, String responsString) {
             Gson gson= GsonUtil.create();
             if((clas.equals(TemperatureSensorData[].class)) &&(status == 201)){
-                 temperatureSensorDatas = gson.fromJson(responsString
+                temperatureSensorDatas = gson.fromJson(responsString
                          ,TemperatureSensorData[].class);
+                tFlag = true;
             }else if((clas.equals(PlrSensorData[].class))&&(status == 201)){
                 plrSensorDatas  = gson.fromJson(responsString
                         ,PlrSensorData[].class);
+                pFlag = true;
             }else if((clas.equals(DailyElectricityPrice.class))&&(status == 201)){
                 dailyElectricityPrice  = gson.fromJson(responsString
                         ,DailyElectricityPrice.class);
+                dFlag = true;
             }else if((clas.equals(ElectricityInfo[].class))&&(status == 201)){
                 electricityInfos  = gson.fromJson(responsString
                         ,ElectricityInfo[].class);
+                eFlag = true;
             }
+            if(tFlag && pFlag && dFlag && eFlag){
+                if((dailyElectricityPrice != null)&&(electricityInfos != null)){
+                    dailyElectricityPriceHelper.setDailyElectricityPrice(dailyElectricityPrice);
+                    totalEnergy = new float[electricityInfos.length];
+                    timeVals2 = new String[electricityInfos.length];
+                    Date[] timexVals = new Date[electricityInfos.length];
 
+                    for(int i=0;i<electricityInfos.length;i++){
+                        totalEnergy[i]=electricityInfos[i].getActivePower()/100;
+                        timeVals2[i] = ""+i+":00";
+                        try {
+                            timexVals[i] = format.parse(timeVals2[i]);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    setData(24, statisticChart, "电价变化", "功率",dailyElectricityPriceHelper.getDailyElectricityPrice(),totalEnergy,timeVals2);
+                }
+                if(temperatureSensorDatas != null && plrSensorDatas != null) {
+
+                    temperatureDatas = new float[12];
+                    Date[] timexVals1 = new Date[12];
+                    timeVals1 = new String[12];
+                    for (int i = 0; i < 48; i+=4) {
+                        temperatureDatas[i/4] = temperatureSensorDatas[i].getTemperatureData();
+                        Log.i("temperature:",i+""+temperatureDatas[i/4]);
+//                timeVals1[i] = temperatureSensorDatas[i].getTemperatureDataCollectTime().toString();
+
+                        timeVals1[i/4] = ""+i/2+":00";
+
+
+                        try {
+                            timexVals1[i/4] = format.parse(timeVals1[i/4]);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    plrDatas = new float[12];
+                    for(int i=0;i<48;i=i+4){
+                        if(plrSensorDatas[i].getPlrData() == true){
+                            plrDatas[i/4] = 1;
+                        }else
+                            plrDatas[i/4] = 0;
+                    }
+
+                    setData(24, contrastChart, "在家状况", "室内温度",plrDatas,temperatureDatas,timeVals1);
+
+                    Log.i("line_chart","line_chart");
+                }
+                drawChart(statisticChart, new float[]{1.3f, -0.5f, 20,0});
+                drawChart(contrastChart, new float[]{1.5f, -0.5f, 30, 0});
+            }
         }
 
     }
@@ -97,11 +160,10 @@ public class StatisticFragment extends Fragment {
                     StaticsDataQueryResolver.queryPlrArrayDatas(activity, new StaticsHttpResultRecessListener
                             <PlrSensorData[]>(PlrSensorData[].class));
 
-                  StaticsDataQueryResolver.queryMeterArrayDatas(activity, new StaticsHttpResultRecessListener
+                    StaticsDataQueryResolver.queryMeterArrayDatas(activity, new StaticsHttpResultRecessListener
                             <ElectricityInfo[]>(ElectricityInfo[].class));
                     StaticsDataQueryResolver.queryPriceDatas(activity, new StaticsHttpResultRecessListener
                             <DailyElectricityPrice>(DailyElectricityPrice.class));
-
 
                 }
             } catch (Exception e) {
@@ -121,6 +183,7 @@ public class StatisticFragment extends Fragment {
         View view =  inflater.inflate(R.layout.activity_contrast_electricity, container, false);
         contrastChart = (LineChart) view.findViewById(R.id.chart1);
         statisticChart = (LineChart) view.findViewById(R.id.chart2);
+        Log.i("life_cycle","statisticFragment onCreateView");
         return view;
     }
 
@@ -128,77 +191,30 @@ public class StatisticFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("life_cycle","statisticFragment onresume");
         flag = true;
-        handler.postDelayed(runnable, 0);
-        drawChart(contrastChart, new float[]{1.5f, -0.5f, 30, 0});
-        if(temperatureSensorDatas != null && plrSensorDatas != null) {
-
-            float[] temperatureDatas = new float[12];
-            Date[] timexVals1 = new Date[12];
-            String[] timeVals1 = new String[12];
-            for (int i = 0; i < 48; i+=4) {
-                temperatureDatas[i/4] = temperatureSensorDatas[i].getTemperatureData();
-                Log.i("temperature:",i+""+temperatureDatas[i/4]);
-//                timeVals1[i] = temperatureSensorDatas[i].getTemperatureDataCollectTime().toString();
-
-                timeVals1[i/4] = ""+i/2+":00";
-
-
-                try {
-                    timexVals1[i/4] = format.parse(timeVals1[i/4]);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-
-            float[] plrDatas = new float[12];
-            for(int i=0;i<48;i=i+4){
-                if(plrSensorDatas[i].getPlrData() == true){
-                    plrDatas[i/4] = 1;
-                }else
-                    plrDatas[i/4] = 0;
-            }
-
+        if(plrDatas != null && temperatureDatas != null && timeVals1 != null)
             setData(24, contrastChart, "在家状况", "室内温度",plrDatas,temperatureDatas,timeVals1);
-        }
-
-
-
-        drawChart(statisticChart, new float[]{1.3f, -0.5f, 20,0});
-        if((dailyElectricityPrice != null)&&(electricityInfos != null)){
-            dailyElectricityPriceHelper.setDailyElectricityPrice(dailyElectricityPrice);
-            float[] totalEnergy = new float[electricityInfos.length];
-            String[] timeVals2 = new String[electricityInfos.length];
-            Date[] timexVals = new Date[electricityInfos.length];
-
-            for(int i=0;i<electricityInfos.length;i++){
-                totalEnergy[i]=electricityInfos[i].getActivePower()/100;
-                    timeVals2[i] = ""+i+":00";
-                try {
-                    timexVals[i] = format.parse(timeVals2[i]);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-
+        if(dailyElectricityPriceHelper != null && totalEnergy != null && timeVals2 != null)
             setData(24, statisticChart, "电价变化", "功率",dailyElectricityPriceHelper.getDailyElectricityPrice(),totalEnergy,timeVals2);
-        }
-
-
-
+        drawChart(contrastChart, new float[]{1.5f, -0.5f, 30, 0});
+        drawChart(statisticChart, new float[]{1.3f, -0.5f, 20,0});
+        handler.postDelayed(runnable, 0);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.i("life_cycle", "statisticFragment onPause");
         flag = false;
+        dFlag = false; eFlag = false; pFlag = false; tFlag = false;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         uiMainActivity = ((UIMainActivity) activity);
+        Log.i("life_cycle","statisticFragment onAttach");
     }
 
 
@@ -311,8 +327,5 @@ public class StatisticFragment extends Fragment {
         rightAxis.setDrawGridLines(true);
 
     }
-
-
-
 
 }

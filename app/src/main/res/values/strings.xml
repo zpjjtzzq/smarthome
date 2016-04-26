@@ -35,4 +35,12 @@
     <string name="current_month">2015-04</string>
     <string name="txt_former_month">上月</string>
     <string name="title_activity_contrast_electricity">ContrastElectricityActivity</string>
+    <string name="app_login">登陆</string>
+    <string name="create_user_account">注册</string>
+    <string name="add_room">新建房间</string>
+    <string name="txt_current_room">当前房间</string>
+
+    <string name="title_activity_create_user">CreateUserActivity</string>
+    <string name="title_activity_app_login">AppLoginActivity</string>
+    <string name="title_activity_add_room">AddRoomActivity</string>
 </resources>

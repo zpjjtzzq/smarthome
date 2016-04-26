@@ -58,6 +58,9 @@ public class MainListViewActivity extends ListActivity {
         this.putIntents(R.string.title_activity_service_test, ServiceTestActivity.class);
         this.putIntents(R.string.title_activity_ui__main, UIMainActivity.class);
         this.putIntents(R.string.title_familyline, ShowFamilylineInfo.class);
+        this.putIntents(R.string.app_login, AppLoginActivity.class);
+        this.putIntents(R.string.create_user_account, CreateUserActivity.class);
+        this.putIntents(R.string.add_room, AddRoomActivity.class);
     }
 
 

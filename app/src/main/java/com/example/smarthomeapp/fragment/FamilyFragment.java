@@ -6,13 +6,20 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.internal.widget.AdapterViewCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.beardedhen.androidbootstrap.BootstrapButton;
 import com.example.smarthomeapp.R;
+import com.example.smarthomeapp.activities.AddRoomActivity;
 import com.example.smarthomeapp.activities.jiazhanpei.ShowFamilylineInfo;
 import com.example.smarthomeapp.activities.xuhong.ApplianceActivity;
 import com.example.smarthomeapp.activities.xuhong.UIMainActivity;
@@ -55,6 +62,8 @@ public class FamilyFragment extends Fragment {
     NoScorllGridView outDoorGridView;
     BootstrapButton familylineToBootStrapButton;
     BootstrapButton devicecontrolToBootStrapButton;
+    Spinner spinner;
+    private Button bnt_add_room;
 
     private SensorGridviewAdapter sensorGridviewAdapter;
     private WeatherInfoAdapter weatherInfoAdapter ;
@@ -219,12 +228,46 @@ public class FamilyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
+        Log.i("life_cycle","familyFragment onCreateView");
         view = inflater.inflate(R.layout.fragment_family, container, false);
         inDoorGridVIew = (NoScorllGridView) view.findViewById(R.id.grid_view_home_environment);
         outDoorGridView = (NoScorllGridView) view.findViewById(R.id.grid_view_outdoor_environment);
         familylineToBootStrapButton = (BootstrapButton)view.findViewById(R.id.familyline_to_bootstrapbutton);
         devicecontrolToBootStrapButton = (BootstrapButton)view.findViewById(R.id.devicecontrol_to_bootstrapbutton);
+
+        //spinner
+        spinner = (Spinner)view.findViewById(R.id.spinner_select_room);
+        String[] strings = new String[3];
+        for(int i = 0; i < strings.length; i++){
+            strings[i] = "房间"+ String.valueOf(i);
+        }
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, strings);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Toast.makeText(uiMainActivity, "切换到房间" + String.valueOf(position), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        /////////////////////////////////////////////////////
+
+        //add room
+        bnt_add_room = (Button)view.findViewById(R.id.add_room);
+        bnt_add_room.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(uiMainActivity, AddRoomActivity.class);
+                intent.putExtra("user_id", uiMainActivity.user_id);
+                startActivity(intent);
+            }
+        });
+        //////////////////////////////////////////////////////////////////////
 
         familylineToBootStrapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,25 +306,29 @@ public class FamilyFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        Log.i("life_cycle","familyFragment onAttach");
         uiMainActivity = ((UIMainActivity) activity);
+        Log.d("family_fragment", uiMainActivity.user_id.toString());
+        //根据user_id查询房间数量, 构建房间列表。
     }
 
     @Override
     public void onResume() {
+        Log.i("life_cycle","familyFragment onResume");
         super.onResume();
         flag = true;
         handler.postDelayed(runnable, 0);
-        handlerWeather.postDelayed(runnableWeather, 0);
+        //handlerWeather.postDelayed(runnableWeather, 0);
+        sensorGridviewAdapter.notifyDataSetChanged();
      /*   weatherInfoAdapter = new WeatherInfoAdapter(this.getActivity());
         outDoorGridView.setAdapter(weatherInfoAdapter);*/
     }
 
     @Override
     public void onPause() {
+        Log.i("life_cycle","FamilyFragment onPause");
         super.onPause();
         flag = false;
     }
-
-
 }
 
