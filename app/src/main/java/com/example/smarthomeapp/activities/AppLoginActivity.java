@@ -125,6 +125,7 @@ public class AppLoginActivity extends Activity implements OnClickListener {
                             case 0 : {
                                 Toast.makeText(activity, "登陆成功！", Toast.LENGTH_LONG).show();
                                 user_id = jsonObject.getInt("user_id");
+                                Log.d("Login", "user_id: " + String.valueOf(user_id));
                                 Log.d("login", user_id.toString());
                                 onLoginSuccess(user_id);
                                 break;
@@ -137,6 +138,9 @@ public class AppLoginActivity extends Activity implements OnClickListener {
                                 Toast.makeText(activity, "服务器错误！", Toast.LENGTH_LONG).show();
                                 break;
                             }
+                            default: {
+                                Toast.makeText(activity, "其他错误", Toast.LENGTH_LONG).show();
+                            }
                         }
                     }catch (Exception e) {
                         e.printStackTrace();
@@ -144,6 +148,7 @@ public class AppLoginActivity extends Activity implements OnClickListener {
                 }
             }
         };
+        name_pwd.clear();
         name_pwd.add(username);
         name_pwd.add(password);
         AppliancesUpdateResolver.app_login(activity, name_pwd, httpResultProcessListener);
@@ -163,6 +168,7 @@ public class AppLoginActivity extends Activity implements OnClickListener {
                     Gson gson = GsonUtil.create();
                     Log.d("login", responsString);
                     Room[] rooms = gson.fromJson(responsString, Room[].class);
+                    Log.d("Login", "rooms: " + String.valueOf(rooms.length));
                     if(rooms == null || rooms.length == 0){
                         Intent intent = new Intent(activity, AddRoomActivity.class);
                         intent.putExtra("user_id", user_id);

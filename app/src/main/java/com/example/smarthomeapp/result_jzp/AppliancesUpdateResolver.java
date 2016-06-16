@@ -103,7 +103,7 @@ public class AppliancesUpdateResolver implements
     /*查询房间*/
     public static void query_room(Context context, Integer user_id, HttpResultProcessListener listener){
         String url = "http://192.168.1.39:8080/smarthome/room/searchroom/" + user_id.toString();
-        Log.d("login", url);
+        Log.d("query_room", url);
         Gson gson = GsonUtil.create();
         String tmpstr = gson.toJson(user_id, Integer.class);
         //AsyncHttpUtil.requestJson(context, url, tmpstr, listener);

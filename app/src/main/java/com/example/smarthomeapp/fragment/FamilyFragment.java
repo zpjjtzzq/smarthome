@@ -27,9 +27,11 @@ import com.example.smarthomeapp.adapter.jia.WeatherInfoAdapter;
 import com.example.smarthomeapp.listener.HttpResultProcessListener;
 import com.example.smarthomeapp.model.HumidySensorData;
 import com.example.smarthomeapp.model.LightSensorData;
+import com.example.smarthomeapp.model.Room;
 import com.example.smarthomeapp.model.jia.HumiditySensorAdapter;
 import com.example.smarthomeapp.model.weather.HeFengWeatherService;
 import com.example.smarthomeapp.model.weather.HeWeatherDataService30;
+import com.example.smarthomeapp.result_jzp.AppliancesUpdateResolver;
 import com.example.smarthomeapp.result_jzp.SensorQueryResolver;
 import com.example.smarthomeapp.result_jzp.WeatherQueryResolver;
 import com.example.smarthomeapp.util.GsonUtil;
@@ -47,14 +49,16 @@ import com.example.smarthomeapp.model.jia.PlrSensorAdapter;
 import com.example.smarthomeapp.model.jia.SensorDataAdapter;
 import com.example.smarthomeapp.model.jia.TemperatureSensorAdapter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class FamilyFragment extends Fragment {
-    private static final int TIME = 5000;
+    private static final int TIME = 1000;
     private boolean flag;
     UIMainActivity uiMainActivity;
     View view;
@@ -64,9 +68,14 @@ public class FamilyFragment extends Fragment {
     BootstrapButton devicecontrolToBootStrapButton;
     Spinner spinner;
     private Button bnt_add_room;
+    private int room_id;
+    private Room[] rooms;
+    private ArrayList<String> strings;
 
     private SensorGridviewAdapter sensorGridviewAdapter;
     private WeatherInfoAdapter weatherInfoAdapter ;
+    ArrayAdapter<String> spinnerAdapter;
+
 
 
      class WeatherResultProcessListener implements HttpResultProcessListener{
@@ -82,70 +91,6 @@ public class FamilyFragment extends Fragment {
     class MyHttpResultProcessListener<T> implements HttpResultProcessListener {
         Class<T> clas;
 
-        /*HttpResultProcessListener httpResultProcessListener = new HttpResultProcessListener() {
-
-
-        @Override
-        public void processing(int status, String responsString) {
-            Gson gson= GsonUtil.create();
-
-            SensorDataAdapter[] sensorDataAdapters=sensorGridviewAdapter.getSensorDataAdapters();
-            if(clas.equals(LightSensorData[].class)){
-                ((LightSensorAdapter)sensorDataAdapters[1]).setLightSensorData(((LightSensorData[])gson.fromJson(responsString, clas))[0]);
-            }else if(clas.equals(FlameSensorData[].class)){
-                ((FlameSensorAdapter)sensorDataAdapters[4]).setFlameSensorData(((FlameSensorData[]) gson.fromJson(responsString, clas))[0]);
-            }else if(clas.equals(PlrSensorData[].class)){
-                ((PlrSensorAdapter)sensorDataAdapters[2]).setPlrSensorData(((PlrSensorData[]) gson.fromJson(responsString, clas))[0]);
-            }else if(clas.equals(TemperatureSensorData[].class)){
-                ((TemperatureSensorAdapter)sensorDataAdapters[0]).setTemperatureSensorData(((TemperatureSensorData[])  gson.fromJson(responsString, clas))[0]);
-            }else if(clas.equals(GasSensorData[].class)){
-                ((GasSensorAdapter)sensorDataAdapters[3]).setGasSensorData(((GasSensorData[]) gson.fromJson(responsString, clas))[0]);
-            }else if(clas.equals(HumidySensorData[].class)){
-                ((HumiditySensorAdapter)sensorDataAdapters[5]).setHumidySensorData(((HumidySensorData[])gson.fromJson(responsString,clas))[0]);
-            }
-
-            sensorGridviewAdapter.notifyDataSetChanged();
-        }
-    };
-
-    Activity activity;
-    HashSet<Integer> ids;
-    Handler handler = new Handler();
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            // handler自带方法实现定时器
-            try {
-                if (flag) {
-                    handler.postDelayed(this, TIME);
-                    ids = new HashSet<Integer>();
-                    ids.add(1);
-                    SensorQueryResolver.querylightSensorData(activity, ids,
-                            new MyHttpResultProcessListener<LightSensorData[]>(LightSensorData[].class));
-                    SensorQueryResolver.queryflameSensorData(activity, ids,
-                            new MyHttpResultProcessListener<FlameSensorData[]>(FlameSensorData[].class));
-                    SensorQueryResolver.querygasSensorData(activity, ids,
-                            new MyHttpResultProcessListener<GasSensorData[]>(GasSensorData[].class));
-                    SensorQueryResolver.queryplrSensorData(activity, ids,
-                            new MyHttpResultProcessListener<PlrSensorData[]>(PlrSensorData[].class));
-                    SensorQueryResolver.querytemperatureSensorData(activity, ids,
-                            new MyHttpResultProcessListener<TemperatureSensorData[]>(TemperatureSensorData[].class));
-                    SensorQueryResolver.queryhumiditySensorData(activity, ids,
-                            new MyHttpResultProcessListener<HumidySensorData[]>(HumidySensorData[].class));
-                    SensorQueryResolver.querylightSensorData(activity, ids, new MyHttpResultProcessListener<LightSensorData[]>(LightSensorData[].class));
-                    SensorQueryResolver.queryflameSensorData(activity, ids, new MyHttpResultProcessListener<FlameSensorData[]>(FlameSensorData[].class));
-                    SensorQueryResolver.querygasSensorData(activity, ids, new MyHttpResultProcessListener<GasSensorData[]>(GasSensorData[].class));
-                    SensorQueryResolver.queryplrSensorData(activity, ids, new MyHttpResultProcessListener<PlrSensorData[]>(PlrSensorData[].class));
-                    SensorQueryResolver.querytemperatureSensorData(activity, ids, new MyHttpResultProcessListener<TemperatureSensorData[]>(TemperatureSensorData[].class));
-                    SensorQueryResolver.queryhumiditySensorData(activity, ids, new MyHttpResultProcessListener<HumidySensorData[]>(HumidySensorData[].class));
-
-                    WeatherQueryResolver.queryWeatherData(activity,new WeatherResultProcessListener());
-                }
-            } catch (Exception e) {
-            }
-        }
-    };*/
-
 
 
         public MyHttpResultProcessListener(Class<T> clas) {
@@ -155,7 +100,7 @@ public class FamilyFragment extends Fragment {
         @Override
         public void processing(int status, String responsString) {
             Gson gson= GsonUtil.create();
-            if(status == 201) {
+            if(status == 201 && flag) {
                 SensorDataAdapter[] sensorDataAdapters = sensorGridviewAdapter.getSensorDataAdapters();
                 if (clas.equals(LightSensorData[].class)) {
                     ((LightSensorAdapter) sensorDataAdapters[1]).setLightSensorData(((LightSensorData[]) gson.fromJson(responsString, clas))[0]);
@@ -171,10 +116,24 @@ public class FamilyFragment extends Fragment {
                     ((HumiditySensorAdapter) sensorDataAdapters[5]).setHumidySensorData(((HumidySensorData[]) gson.fromJson(responsString, clas))[0]);
                 }
             }
-
             sensorGridviewAdapter.notifyDataSetChanged();
         }
     }
+    HttpResultProcessListener httpResultProcessListenerQueryRoom =  new HttpResultProcessListener() {
+        @Override
+        public void processing(int status, String responsString) {
+            if(status == 201){
+                Gson gson = GsonUtil.create();
+                rooms = gson.fromJson(responsString, Room[].class);
+                Log.d("query_room", responsString);
+                strings.clear();
+                for(int i = 0; i < rooms.length; i++){
+                    strings.add(rooms[i].getRoomName());
+                }
+                spinnerAdapter.notifyDataSetChanged();
+            }
+        }
+    };
     Activity activity;
     HashSet<Integer> ids;
     Handler handler = new Handler();
@@ -237,18 +196,34 @@ public class FamilyFragment extends Fragment {
 
         //spinner
         spinner = (Spinner)view.findViewById(R.id.spinner_select_room);
-        String[] strings = new String[3];
-        for(int i = 0; i < strings.length; i++){
-            strings[i] = "房间"+ String.valueOf(i);
-        }
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, strings);
-        spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //Toast.makeText(uiMainActivity, "切换到房间" + String.valueOf(position), Toast.LENGTH_LONG).show();
-            }
+                room_id = rooms[position].getRoomId();
+                Toast.makeText(uiMainActivity, "切换到房间: " + rooms[position].getRoomName(), Toast.LENGTH_LONG).show();
+                if(rooms[position].getRoomName().equals("107")){
+                    handler.removeCallbacks(runnable);
+                    flag = false;
+                    SensorDataAdapter[] sensorDataAdapters = sensorGridviewAdapter.getSensorDataAdapters();
 
+                    ((LightSensorAdapter) sensorDataAdapters[1]).setLightSensorData(new LightSensorData());
+
+                    ((FlameSensorAdapter) sensorDataAdapters[4]).setFlameSensorData(new FlameSensorData());
+
+                    ((PlrSensorAdapter) sensorDataAdapters[2]).setPlrSensorData(new PlrSensorData());
+
+                    ((TemperatureSensorAdapter) sensorDataAdapters[0]).setTemperatureSensorData(new TemperatureSensorData());
+
+                    ((GasSensorAdapter) sensorDataAdapters[3]).setGasSensorData(new GasSensorData());
+
+                    ((HumiditySensorAdapter) sensorDataAdapters[5]).setHumidySensorData(new HumidySensorData());
+                    sensorGridviewAdapter.notifyDataSetChanged();
+                }
+                if(rooms[position].getRoomName().equals("106")){
+                    flag = true;
+                    handler.postDelayed(runnable,0);
+                }
+            }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -274,15 +249,19 @@ public class FamilyFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(getActivity(),ShowFamilylineInfo.class);
+                intent.putExtra("room_id", room_id);
+                intent.putExtra("user_id", uiMainActivity.user_id);
                 startActivity(intent);
             }
         });
-
         devicecontrolToBootStrapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(getActivity(),ApplianceActivity.class);
+                intent.setClass(getActivity(), ApplianceActivity.class);
+                intent.putExtra("room_id", room_id);
+                intent.putExtra("user_id", uiMainActivity.user_id);
+                Log.d("appliance user_id", uiMainActivity.user_id.toString());
                 startActivity(intent);
             }
         });
@@ -296,10 +275,11 @@ public class FamilyFragment extends Fragment {
         sensorGridviewAdapter.getSensorDataAdapters()[5]=new HumiditySensorAdapter(this.getActivity(),null);
         sensorGridviewAdapter.getSensorDataAdapters()[4]=new FlameSensorAdapter(this.getActivity(),null);
         sensorGridviewAdapter.getSensorDataAdapters()[3]=new GasSensorAdapter(this.getActivity(),null);
-
-
         weatherInfoAdapter = new WeatherInfoAdapter(this.getActivity());
         outDoorGridView.setAdapter(weatherInfoAdapter);
+        strings = new ArrayList<String>();
+        spinnerAdapter= new ArrayAdapter<String>(uiMainActivity, android.R.layout.simple_spinner_item, strings);
+        spinner.setAdapter(spinnerAdapter);
         return view;
     }
 
@@ -308,20 +288,18 @@ public class FamilyFragment extends Fragment {
         super.onAttach(activity);
         Log.i("life_cycle","familyFragment onAttach");
         uiMainActivity = ((UIMainActivity) activity);
-        Log.d("family_fragment", uiMainActivity.user_id.toString());
-        //根据user_id查询房间数量, 构建房间列表。
+        Log.d("family_fragment", "user_id: " + uiMainActivity.user_id.toString());
     }
 
     @Override
     public void onResume() {
-        Log.i("life_cycle","familyFragment onResume");
+        Log.i("life_cycle", "familyFragment onResume");
         super.onResume();
         flag = true;
         handler.postDelayed(runnable, 0);
         //handlerWeather.postDelayed(runnableWeather, 0);
         sensorGridviewAdapter.notifyDataSetChanged();
-     /*   weatherInfoAdapter = new WeatherInfoAdapter(this.getActivity());
-        outDoorGridView.setAdapter(weatherInfoAdapter);*/
+        AppliancesUpdateResolver.query_room(uiMainActivity, uiMainActivity.user_id, httpResultProcessListenerQueryRoom);
     }
 
     @Override

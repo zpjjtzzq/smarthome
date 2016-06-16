@@ -22,6 +22,7 @@ import com.example.smarthomeapp.activities.xuhong.ApplianceActivity;
 import com.example.smarthomeapp.activities.xuhong.ContrastElectricityActivity;
 import com.example.smarthomeapp.activities.xuhong.StatisticComplaindegreeActivity;
 import com.example.smarthomeapp.activities.xuhong.UIMainActivity;
+import com.example.smarthomeapp.services.CollectDataService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +78,12 @@ public class MainListViewActivity extends ListActivity {
         items = intents.keySet().toArray(new String[0]);
         setListAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, items));
+
+        ////////////////////////启动服务
+        Intent intent = new Intent(this, CollectDataService.class);
+        startService(intent);
+
+        //////////////////////////////////////////
     }
 
     @Override

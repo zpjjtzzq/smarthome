@@ -299,7 +299,6 @@ public class CollectDataService extends Service {
         weiboTimer = new Timer();
         weiBoEventTimerTask = new WeiBoEventTimerTask();
         weiboTimer.schedule(weiBoEventTimerTask, 2000, 2000);
-
     }
 
     @Override

@@ -40,7 +40,7 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
     private Integer user_id;
     private Room room;
     ProgressDialog progress;
-    private Activity activity;
+    private Activity activity = this;
     private UserInfo userInfo;
 
     private void initActionBar(){
@@ -55,10 +55,15 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
     private  void initView(){
         editText_new_room = (EditText)findViewById(R.id.new_room);
         checkBox_aircondition = (CheckBox)findViewById(R.id.cb_air_condition);
+        checkBox_aircondition.setOnCheckedChangeListener(this);
         checkBox_water_heater = (CheckBox) findViewById(R.id.cb_water_heater);
+        checkBox_water_heater.setOnCheckedChangeListener(this);
         checkBox_curtain  = (CheckBox) findViewById(R.id.cb_curtain);
+        checkBox_curtain.setOnCheckedChangeListener(this);
         checkBox_lamp = (CheckBox) findViewById(R.id.cb_lamp);
+        checkBox_lamp.setOnCheckedChangeListener(this);
         checkBox_plug = (CheckBox) findViewById(R.id.cb_plug);
+        checkBox_plug.setOnCheckedChangeListener(this);
         add_room = (Button) findViewById(R.id.bnt_add_room);
         add_room.setOnClickListener(this);
         actionBar = getActionBar();
@@ -91,6 +96,14 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
                     finish();
                     break;
                 }
+                case 1 : {
+                    Toast.makeText(activity, "房间名重复", Toast.LENGTH_LONG).show();
+                    break;
+                }
+                case 2 : {
+                    Toast.makeText(activity, "服务器错误", Toast.LENGTH_LONG).show();
+                    break;
+                }
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -117,7 +130,7 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
         progress.setCanceledOnTouchOutside(false);
         progress.setMessage("新建房间中...");
         progress.show();
-        AppliancesUpdateResolver.create_room(new Activity(), room, httpResultProcessListener);
+        AppliancesUpdateResolver.create_room(this, room, httpResultProcessListener);
     }
 
     boolean check_room_name(){
@@ -138,6 +151,11 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
         Log.d("add_room", user_id.toString());
         userInfo.setUserId(user_id);
         room.setUserInfo(userInfo);
+        room.setIsExistedAirCondition(false);
+        room.setIsExistedSheSwitch(false);
+        room.setIsExistedWaterHeater(false);
+        room.setIsExistedLamp(false);
+        room.setIsExistedCurtain(false);
         Log.d("add_room", "onCreate");
     }
 
@@ -152,8 +170,10 @@ public class AddRoomActivity extends Activity implements CompoundButton.OnChecke
     public  void onCheckedChanged(CompoundButton arg0, boolean arg1){
         switch (arg0.getId()){
             case R.id.cb_air_condition:
-                if(arg1)
+                if(arg1) {
+                    //Toast.makeText(activity, "选中空调", Toast.LENGTH_LONG).show();
                     room.setIsExistedAirCondition(true);
+                }
                 else
                     room.setIsExistedAirCondition(false);
                 break;

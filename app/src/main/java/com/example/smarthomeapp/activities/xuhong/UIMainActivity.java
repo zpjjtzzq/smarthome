@@ -106,15 +106,11 @@ public class UIMainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("life_cycle", "ui_main_create");
+        Log.d("life_cycle", "ui_main onCreate");
         setContentView(R.layout.activity_ui_main);
-        ////////////////////////启动服务
-        Intent intent = new Intent(this, CollectDataService.class);
-        startService(intent);
-        //////////////////////////////////////////
         //获取user_id
         Intent intent_user = getIntent();
-        user_id = intent_user.getIntExtra("user_id", 2);
+        user_id = intent_user.getIntExtra("user_id", 0);
         ////////////////////////
         findViews();
         initActionBar();
